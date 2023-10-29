@@ -22,7 +22,7 @@ Dobby a lightweight, multi-platform, multi-architecture exploit hook framework.
 
 ## Download
 
-[download latest library](releases/tag/latest)
+[download latest library](https://github.com/hx1997/Dobby-openharmony-linux/releases/tag/latest)
 
 ## Credits
 
