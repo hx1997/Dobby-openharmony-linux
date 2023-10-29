@@ -1,7 +1,7 @@
 This is Dobby ported to OpenHarmony. To build, run this on Windows:
 
 ```bash
-python scripts\platform_builder.py --platform=openharmony --arch=arm64 --cmake_dir=%OHOS_NDK_HOME%\build-tools\cmake --llvm_dir=C:\\Users\\<用户名>\\AppData\\Local\\Huawei\\Sdk\\openharmony\\9\\native\\llvm
+python scripts\platform_builder.py --platform=openharmony --arch=arm64 --cmake_dir=%OHOS_NDK_HOME%\build-tools\cmake --llvm_dir=C:\\Users\\<user name>\\AppData\\Local\\Huawei\\Sdk\\openharmony\\9\\native\\llvm
 ```
 
 where `%OHOS_NDK_HOME%` is the path to your OpenHarmony NDK (e.g., `%LOCALAPPDATA%\\Huawei\\Sdk\\openharmony\\9\\native`).
