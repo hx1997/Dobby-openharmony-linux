@@ -1,4 +1,4 @@
-This is Dobby ported to OpenHarmony. To build, run this on Windows:
+This is Dobby ported to OpenHarmony (Linux kernel). To build, run this on Windows:
 
 ```bash
 python scripts\platform_builder.py --platform=openharmony --arch=arm64 --cmake_dir=%OHOS_NDK_HOME%\build-tools\cmake --llvm_dir=C:\\Users\\<user name>\\AppData\\Local\\Huawei\\Sdk\\openharmony\\9\\native\\llvm
