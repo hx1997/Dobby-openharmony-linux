@@ -11,6 +11,10 @@ include(cmake/xcode_generator_helper.cmake)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
+if (SYSTEM.OHOS)
+  set(CMAKE_C_COMPILER_WORKS 1)
+  set(CMAKE_CXX_COMPILER_WORKS 1)
+endif ()
 
 auto_source_group("." "auto-source-group" "\\.(cc|cpp|c|h)$")
 
@@ -203,7 +207,7 @@ elseif (SYSTEM.Darwin)
     source/Backend/UserMode/ExecMemory/clear-cache-tool-all.c
     )
 
-elseif (SYSTEM.Linux OR SYSTEM.Android)
+elseif (SYSTEM.Linux OR SYSTEM.Android OR SYSTEM.OHOS)
   set(dobby.SOURCE_FILE_LIST ${dobby.SOURCE_FILE_LIST}
     # platform util
     source/Backend/UserMode/PlatformUtil/Linux/ProcessRuntimeUtility.cc
@@ -386,7 +390,7 @@ if (SYSTEM.Android)
   endif ()
 endif ()
 
-if (SYSTEM.Linux)
+if (SYSTEM.Linux OR SYSTEM.OHOS)
   target_link_libraries(dobby dl)
 endif ()
 

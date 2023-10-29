@@ -12,6 +12,7 @@ platforms = {
   "macos": ["x86_64", "arm64", "arm64e"],
   "iphoneos": ["arm64", "arm64e"],
   "linux": ["x86", "x86_64", "arm", "arm64"],
+  "openharmony": ["x86", "x86_64", "arm", "arm64"],
   "android": ["x86", "x86_64", "armeabi-v7a", "arm64-v8a"]
 }
 
@@ -57,7 +58,8 @@ class PlatformBuilder(object):
     os.system(cmd_line)
 
   def setup_common_args(self):
-    self.cmake_args += [f"-DCMAKE_C_COMPILER={self.clang}", f"-DCMAKE_CXX_COMPILER={self.clangxx}"]
+    if self.platform != "openharmony":
+      self.cmake_args += [f"-DCMAKE_C_COMPILER={self.clang}", f"-DCMAKE_CXX_COMPILER={self.clangxx}"]
 
     self.cmake_args += ["-DCMAKE_BUILD_TYPE={}".format(self.cmake_build_type)]
 
@@ -122,6 +124,44 @@ class LinuxPlatformBuilder(PlatformBuilder):
       "-DCMAKE_SYSTEM_NAME=Linux",
       "-DCMAKE_SYSTEM_PROCESSOR={}".format(arch),
     ]
+
+class OpenHarmonyPlatformBuilder(PlatformBuilder):
+
+  def __init__(self, project_dir, library_build_type, arch):
+    super().__init__(project_dir, library_build_type, "openharmony", arch)
+
+    self.shared_output_name = "libdobby.so"
+    self.static_output_name = "libdobby.a"
+
+    self.cmake_build_dir = f"{self.project_dir}\\build\\cmake-build-{platform}-{arch}"
+    self.output_dir = f"{self.project_dir}\\build\\{platform}\\{arch}"
+
+    targets = {
+      "x86": "i686-linux-gnu",
+      "x86_64": "x86_64-linux-gnu",
+      "arm": "arm-linux-gnueabi",
+      "aarch64": "aarch64-linux-gnu",
+    }
+
+    # self.cmake_args += ["--target={}".format(targets[arch])]
+    self.cmake_args += [
+      "-DCMAKE_SYSTEM_NAME=OHOS",
+      "-DCMAKE_SYSTEM_PROCESSOR={}".format(arch),
+      "-DCMAKE_TOOLCHAIN_FILE=%OHOS_NDK_HOME%/build/cmake/ohos.toolchain.cmake",
+      "-DCMAKE_MAKE_PROGRAM=%OHOS_NDK_HOME%/build-tools/cmake/bin/ninja.exe",
+      "-DOHOS_STL=c++_static",
+      "-G Ninja"
+    ]
+
+  def build(self):
+    subprocess.run("mkdir {}".format(self.output_dir), shell=True, check=True)
+    self.cmake_generate_build_system()
+
+    subprocess.run("cmake --build . --clean-first --target dobby --target dobby_static -- -j8", cwd=self.cmake_build_dir, shell=True, check=True)
+
+    os.system(f"mkdir {self.output_dir}")
+    os.system(f"copy {self.cmake_build_dir}/{self.shared_output_name} {self.output_dir}")
+    os.system(f"copy {self.cmake_build_dir}/{self.static_output_name} {self.output_dir}")
 
 
 class AndroidPlatformBuilder(PlatformBuilder):
@@ -229,6 +269,8 @@ if __name__ == "__main__":
       builder = AndroidPlatformBuilder(args.android_ndk_dir, project_dir, library_build_type, arch_)
     elif platform == "linux":
       builder = LinuxPlatformBuilder(project_dir, library_build_type, arch_)
+    elif platform == "openharmony":
+      builder = OpenHarmonyPlatformBuilder(project_dir, library_build_type, arch_)
     else:
       logging.error("invalid platform {}".format(platform))
       sys.exit(-1)
